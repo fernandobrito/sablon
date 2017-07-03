@@ -315,6 +315,18 @@ class ProcessorDocumentTest < Sablon::TestCase
     document
   end
 
+  # Figures have unique identifiers
+  # Loop should assign random identifiers to all figures
+  def test_loop_with_figure
+    original = snippet("figure_loop")
+    result = process(original, { numbers: [1, 2] })
+
+    result_ids = Nokogiri::XML(result).search("//@id").map(&:value)
+
+    # asserts there are no repeated ids
+    assert_equal result_ids.length, result_ids.uniq.length
+  end
+
   def test_loop_over_collection_convertable_to_an_enumerable
     style_collection = Class.new do
       def to_ary

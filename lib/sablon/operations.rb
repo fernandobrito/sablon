@@ -17,11 +17,20 @@ module Sablon
         value = value.to_ary if value.respond_to?(:to_ary)
         raise ContextError, "The expression #{list_expr.inspect} should evaluate to an enumerable but was: #{value.inspect}" unless value.is_a?(Enumerable)
 
-        content = value.flat_map do |item|
+        contents = value.flat_map do |item|
           iter_env = env.alter_context(iterator_name => item)
           block.process(iter_env)
         end
-        block.replace(content.reverse)
+
+        locate_and_update_ids(contents)
+        block.replace(contents.reverse)
+      end
+
+      def locate_and_update_ids(contents)
+        contents.each_with_index do |content, index|
+          elements_with_id = content.search('.//*[@id]')
+          elements_with_id.each { |element| element['id'] += index.to_s }
+        end
       end
     end
 
