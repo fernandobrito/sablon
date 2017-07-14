@@ -7,6 +7,7 @@ module Sablon
     attr_reader :numbering
     attr_reader :relationships
     attr_reader :context
+    attr_reader :id_tracker
 
     attr_reader :current_entry
     attr_writer :current_entry
@@ -34,12 +35,14 @@ module Sablon
         @images = parent_env.images
         @numbering = parent_env.numbering
         @relationships = parent_env.relationships
+        @id_tracker = parent_env.id_tracker
       else
         @current_entry = nil
         @template = template
         @images = Images.new
         @numbering = Numbering.new
         @relationships = Sablon::Processor::Relationships.new
+        @id_tracker = Sablon::Processor::IdTracker.new
       end
       #
       @context = Context.transform_hash(context)

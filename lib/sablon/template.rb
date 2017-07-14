@@ -30,6 +30,8 @@ module Sablon
         end
         # get initial rid of all files
         env.relationships.initialize_rids(zip_contents)
+        # get highest id
+        env.id_tracker.find_highest_id(zip_contents)
         # step through and process each file
         zip_contents.each do |entry_name, content|
           env.current_entry = entry_name

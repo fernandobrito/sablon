@@ -13,6 +13,8 @@ module Sablon
 
     class Loop < Struct.new(:list_expr, :iterator_name, :block)
       def evaluate(env)
+        return unless block
+
         value = list_expr.evaluate(env.context)
         value = [] if value.nil?
         value = value.to_ary if value.respond_to?(:to_ary)
@@ -23,14 +25,16 @@ module Sablon
           block.process(iter_env)
         end
 
-        locate_and_update_ids(contents)
+        locate_and_update_ids(contents, env)
         block.replace(contents.reverse)
       end
 
-      def locate_and_update_ids(contents)
-        contents.each_with_index do |content, index|
-          elements_with_id = content.search('.//*[@id]')
-          elements_with_id.each { |element| element['id'] += index.to_s }
+      def locate_and_update_ids(contents, env)
+        # Do not process first entry (original body of loop on template)
+        # to preserve its ids
+        return unless contents.length > 1
+        contents[1..-1].each do |content|
+          env.id_tracker.update_ids(content)
         end
       end
     end
